@@ -1,34 +1,14 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-} from "react-native";
-import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import productApi from "../apis/product.api";
-import { ProductListConfig } from "../types/product.type";
-import { Fontisto, Ionicons } from "@expo/vector-icons";
-import { SIZES } from "../constants/sizes";
-import { COLORS } from "../constants/color";
-import Header from "../components/Header";
+import React from "react";
+import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import categoryApi from "../apis/categories.api";
+import Header from "../components/Header";
 import Heading from "../components/Heading";
 import { ProductRow } from "../components/product";
+import { COLORS } from "../constants/color";
+import { SIZES } from "../constants/sizes";
 
 const HomeScreen = () => {
-  const queryConfig = {
-    page: 1,
-    limit: 10,
-  };
-  const { data: productsData } = useQuery({
-    queryKey: ["products", queryConfig],
-    queryFn: () => {
-      return productApi.getProducts(queryConfig as ProductListConfig);
-    },
-  });
   const { data: categoriesData } = useQuery({
     queryKey: ["categories"],
     queryFn: () => {
