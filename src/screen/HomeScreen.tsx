@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import categoryApi from "../apis/categories.api";
 import Header from "../components/Header";
@@ -7,14 +7,32 @@ import Heading from "../components/Heading";
 import { ProductRow } from "../components/product";
 import { COLORS } from "../constants/color";
 import { SIZES } from "../constants/sizes";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AppContext } from "../contexts/app.context";
 
 const HomeScreen = () => {
+  const { profile, setProfile, setIsAuthenticated } = useContext(AppContext);
   const { data: categoriesData } = useQuery({
     queryKey: ["categories"],
     queryFn: () => {
       return categoryApi.getCategories();
     },
   });
+  React.useEffect(() => {
+    const checkExistingUser = async () => {
+      try {
+        const data = await AsyncStorage.getItem("profile");
+        if (data !== null) {
+          const user = JSON.parse(data);
+          setProfile(user);
+          setIsAuthenticated(true);
+        } else {
+          console.log("not login");
+        }
+      } catch (error) {}
+    };
+    checkExistingUser();
+  }, []);
   return (
     <SafeAreaView>
       <Header />

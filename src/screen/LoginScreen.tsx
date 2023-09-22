@@ -18,13 +18,17 @@ import { SIZES } from "../constants/sizes";
 import { Input } from "../components";
 import { useMutation } from "@tanstack/react-query";
 import authApi from "../apis/auth.api";
+import { AppContext } from "../contexts/app.context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface LoginScreenProps {}
-type FormData = {
+export type FormData = {
   email: string;
   password: string;
 };
 const LoginScreen = (props: LoginScreenProps) => {
+  const { setIsAuthenticated, setProfile, profile } =
+    React.useContext(AppContext);
   const navigation = useNavigation();
   const {
     register,
@@ -39,8 +43,18 @@ const LoginScreen = (props: LoginScreenProps) => {
   });
   const onSubmit = (data: any) => {
     loginMutation.mutate(data, {
-      onSuccess: (data) => {
-        console.log(data);
+      onSuccess: async (data) => {
+        setIsAuthenticated(true);
+        setProfile(data.data.data.user);
+        await AsyncStorage.setItem(
+          "profile",
+          JSON.stringify(data.data.data.user || "")
+        );
+        await AsyncStorage.setItem(
+          "token",
+          JSON.stringify(data.data.data.access_token || "")
+        );
+        navigation.replace("Bottom Navigation");
       },
       onError: (error) => {
         console.log(error);

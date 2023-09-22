@@ -32,7 +32,6 @@ const CategoryScreen = ({ navigation, route }: CategoryScreenProps) => {
       return productApi.getProducts(queryConfig as ProductListConfig);
     },
   });
-  console.log(queryConfig);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.wrapper}>

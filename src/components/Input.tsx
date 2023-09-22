@@ -10,10 +10,11 @@ import { Control, Controller, FieldErrors, FieldValues } from "react-hook-form";
 import { COLORS } from "../constants/color";
 import { SIZES } from "../constants/sizes";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { FormData } from "../screen/LoginScreen";
 interface InputProps {
   icon: any;
   label: string;
-  control: Control<FieldValues, any>;
+  control: Control<FormData, any>;
   errors: FieldErrors<FieldValues>;
   name: string;
   isPassword?: boolean;

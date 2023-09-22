@@ -13,22 +13,28 @@ import {
 } from "react-native";
 import { COLORS } from "../constants/color";
 import { SIZES } from "../constants/sizes";
+import { AppContext } from "../contexts/app.context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface ProfileScreenProps {}
 
 const ProfileScreen = (props: ProfileScreenProps) => {
   const logout = () => {
     Alert.alert("Logout", "Are you sure you want to log out", [
-      { text: "Cancel", onPress: () => console.log("cancel pressed") },
+      { text: "Cancel", onPress: () => {} },
       {
         text: "Continue",
-        onPress: async () => {},
+        onPress: async () => {
+          await AsyncStorage.removeItem("profile");
+          setIsAuthenticated(false);
+          setProfile(null);
+        },
       },
     ]);
   };
   const navigation = useNavigation();
-  const userLogin = false;
-  const userdata = "";
+  const { isAuthenticated, profile, setIsAuthenticated, setProfile } =
+    React.useContext(AppContext);
   return (
     <View style={styles.container}>
       <View style={styles.container}>
@@ -37,7 +43,7 @@ const ProfileScreen = (props: ProfileScreenProps) => {
           <Image
             style={styles.cover}
             source={{
-              uri: `https://api-ecom.duthanhduoc.com/images/${userdata?.avatar}`,
+              uri: `https://api-ecom.duthanhduoc.com/images/${profile?.avatar}`,
             }}
           />
         </View>
@@ -45,13 +51,13 @@ const ProfileScreen = (props: ProfileScreenProps) => {
           <Image
             style={styles.profile}
             source={{
-              uri: `https://api-ecom.duthanhduoc.com/images/${userdata?.avatar}`,
+              uri: `https://api-ecom.duthanhduoc.com/images/${profile?.avatar}`,
             }}
           />
           <Text style={styles.name}>
-            {userLogin ? "Vu Quang" : "Please login to your account"}
+            {isAuthenticated ? "Vu Quang" : "Please login to your account"}
           </Text>
-          {!userLogin ? (
+          {!isAuthenticated ? (
             <TouchableOpacity onPress={() => navigation.navigate("Login")}>
               <View style={styles.loginBtn}>
                 <Text>Login</Text>
@@ -59,10 +65,10 @@ const ProfileScreen = (props: ProfileScreenProps) => {
             </TouchableOpacity>
           ) : (
             <View style={styles.loginBtn}>
-              <Text>{userdata?.email}</Text>
+              <Text>{profile?.email}</Text>
             </View>
           )}
-          {!userLogin ? (
+          {!isAuthenticated ? (
             <View></View>
           ) : (
             <ScrollView>

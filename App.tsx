@@ -1,9 +1,9 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet } from "react-native";
-import { AppProvider } from "./src/contexts/app.context";
+import { AppContext, AppProvider } from "./src/contexts/app.context";
 import BottomTabNavigation from "./src/navigation/BottomTabNavigation";
 import {
   CartScreen,
@@ -13,10 +13,12 @@ import {
   ProductDetailScreen,
   SignUpScreen,
 } from "./src/screen";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const Stack = createNativeStackNavigator();
 const queryClient = new QueryClient();
 
 export default function App() {
+  const { setProfile } = React.useContext(AppContext);
   return (
     <QueryClientProvider client={queryClient}>
       <AppProvider>
