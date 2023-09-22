@@ -1,12 +1,23 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import { SIZES } from "../constants/sizes";
 import { COLORS } from "../constants/color";
 import { Fontisto, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { useQuery } from "@tanstack/react-query";
+import { purchasesStatus } from "../constants/purchases";
+import { getPurchases } from "../apis/purchase.api";
+import { AppContext } from "../contexts/app.context";
 
 export default function Header() {
   const navigation = useNavigation();
+  const { isAuthenticated } = useContext(AppContext);
+  const { data: purchasesInCartData } = useQuery({
+    queryKey: ["purchases", { status: purchasesStatus.inCart }],
+    queryFn: () => getPurchases({ status: purchasesStatus.inCart }),
+    enabled: isAuthenticated,
+  });
+  const total = purchasesInCartData?.data.data.length;
   return (
     <View style={styles.appBarWrapper}>
       <View style={styles.appBar}>
@@ -14,7 +25,7 @@ export default function Header() {
         <Text style={styles.location}>Ha Noi</Text>
         <View style={{ alignItems: "flex-end" }}>
           <View style={styles.cartCount}>
-            <Text style={styles.cartNumber}>{0} </Text>
+            <Text style={styles.cartNumber}>{total} </Text>
           </View>
           <TouchableOpacity onPress={() => navigation.navigate("Cart")}>
             <Fontisto name="shopping-bag" size={24} />

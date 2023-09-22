@@ -55,7 +55,7 @@ const ProfileScreen = (props: ProfileScreenProps) => {
             }}
           />
           <Text style={styles.name}>
-            {isAuthenticated ? "Vu Quang" : "Please login to your account"}
+            {isAuthenticated ? profile?.name : "Please login to your account"}
           </Text>
           {!isAuthenticated ? (
             <TouchableOpacity onPress={() => navigation.navigate("Login")}>
