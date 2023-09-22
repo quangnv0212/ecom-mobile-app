@@ -38,7 +38,7 @@ export default function App() {
           <Stack.Screen
             name="Category"
             component={CategoryScreen}
-            options={{ headerShown: true }}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name="Login"
