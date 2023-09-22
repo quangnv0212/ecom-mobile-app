@@ -15,6 +15,7 @@ import {
 import Button from "../components/Button";
 import { COLORS } from "../constants/color";
 import { SIZES } from "../constants/sizes";
+import { Input } from "../components";
 
 interface LoginScreenProps {}
 
@@ -31,79 +32,40 @@ const LoginScreen = (props: LoginScreenProps) => {
   const onSubmit = (data: any) => {
     console.log(data);
   };
-  const [obsecureText, setObsercureText] = React.useState(true);
   return (
     <ScrollView>
       <SafeAreaView style={{ marginHorizontal: 20 }}>
         <View>
           <View>
-            <View style={styles.wrapper}>
-              <Text style={styles.label}>Email</Text>
-              <View style={styles.inputWrapper}>
+            <Input
+              control={control}
+              errors={errors}
+              label="Email"
+              name="email"
+              icon={
                 <MaterialCommunityIcons
                   name="email-outline"
                   size={20}
                   color={COLORS.gray}
                   style={styles.iconStyle}
                 />
-                <Controller
-                  rules={{
-                    required: true,
-                  }}
-                  control={control}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      autoCapitalize="none"
-                      style={styles.input}
-                      onBlur={onBlur}
-                      onChangeText={(value) => onChange(value)}
-                      value={value}
-                    />
-                  )}
-                  name="email"
-                />
-              </View>
-              {errors.email && (
-                <Text style={styles.errorMessage}>This is required.</Text>
-              )}
-            </View>
-            <View style={styles.wrapper}>
-              <Text style={styles.label}>Password</Text>
-              <View style={styles.inputWrapper}>
+              }
+            />
+            <Input
+              control={control}
+              errors={errors}
+              label="Password"
+              name="password"
+              isPassword={true}
+              icon={
                 <MaterialCommunityIcons
                   name="lock-outline"
                   size={20}
                   color={COLORS.gray}
                   style={styles.iconStyle}
                 />
-                <Controller
-                  control={control}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      secureTextEntry={obsecureText}
-                      style={styles.input}
-                      onBlur={onBlur}
-                      onChangeText={(value) => onChange(value)}
-                      value={value}
-                    />
-                  )}
-                  name="password"
-                  rules={{ required: true }}
-                />
-                <TouchableOpacity
-                  onPress={() => {
-                    setObsercureText((prev) => !prev);
-                  }}
-                >
-                  <MaterialCommunityIcons
-                    name={obsecureText ? "eye-outline" : "eye-off-outline"}
-                  />
-                </TouchableOpacity>
-              </View>
-              {errors.password && (
-                <Text style={styles.errorMessage}>This is required.</Text>
-              )}
-            </View>
+              }
+            />
             <Button
               isValid={Boolean(errors)}
               title="Login"
