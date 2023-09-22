@@ -1,3 +1,4 @@
 import ProductCardView from "./ProductCardView";
 import ProductRow from "./ProductRow";
-export { ProductCardView, ProductRow };
+import CardCartView from "./CardCartView";
+export { ProductCardView, ProductRow, CardCartView };
