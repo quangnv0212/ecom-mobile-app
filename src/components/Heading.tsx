@@ -21,7 +21,7 @@ const Heading = ({ cate }: HeadingProps) => {
         <TouchableOpacity
           onPress={() =>
             navigation.navigate("Category", {
-              id: cate._id,
+              _id: cate._id,
               name: cate.name,
             })
           }

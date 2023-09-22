@@ -21,9 +21,9 @@ const ProductRow = ({ category }: ProductRowProps) => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["products", { limit: 10, page: 1 }],
+    queryKey: ["products", { limit: 10, page: 1, category }],
     queryFn: () => {
-      return productApi.getProducts({ limit: 10, page: 1 });
+      return productApi.getProducts({ limit: 10, page: 1, category });
     },
   });
   return (
