@@ -27,7 +27,7 @@ const ProfileScreen = (props: ProfileScreenProps) => {
     ]);
   };
   const navigation = useNavigation();
-  const userLogin = true;
+  const userLogin = false;
   const userdata = "";
   return (
     <View style={styles.container}>
