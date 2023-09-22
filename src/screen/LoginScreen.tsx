@@ -16,9 +16,14 @@ import Button from "../components/Button";
 import { COLORS } from "../constants/color";
 import { SIZES } from "../constants/sizes";
 import { Input } from "../components";
+import { useMutation } from "@tanstack/react-query";
+import authApi from "../apis/auth.api";
 
 interface LoginScreenProps {}
-
+type FormData = {
+  email: string;
+  password: string;
+};
 const LoginScreen = (props: LoginScreenProps) => {
   const navigation = useNavigation();
   const {
@@ -28,9 +33,19 @@ const LoginScreen = (props: LoginScreenProps) => {
     control,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm<FormData>();
+  const loginMutation = useMutation({
+    mutationFn: (body: FormData) => authApi.login(body),
+  });
   const onSubmit = (data: any) => {
-    console.log(data);
+    loginMutation.mutate(data, {
+      onSuccess: (data) => {
+        console.log(data);
+      },
+      onError: (error) => {
+        console.log(error);
+      },
+    });
   };
   return (
     <ScrollView>
