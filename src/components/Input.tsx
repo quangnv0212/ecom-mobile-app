@@ -14,7 +14,7 @@ import { FormData } from "../screen/LoginScreen";
 interface InputProps {
   icon: any;
   label: string;
-  control: Control<FormData, any>;
+  control: Control<any, any>;
   errors: FieldErrors<FieldValues>;
   name: string;
   isPassword?: boolean;
