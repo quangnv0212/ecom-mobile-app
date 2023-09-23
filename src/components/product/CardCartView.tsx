@@ -12,14 +12,32 @@ import {
 import { COLORS } from "../../constants/color";
 import { SIZES } from "../../constants/sizes";
 import { AppContext } from "../../contexts/app.context";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+  useMutation,
+} from "@tanstack/react-query";
+import { updatePurchase } from "../../apis/purchase.api";
+import { AxiosResponse } from "axios";
+import { SuccessResponse } from "../../types/utils.type";
+import { Purchase } from "../../types/purchase.type";
 
 interface CardCartViewProps {
   data: any;
+  refetch: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<
+    QueryObserverResult<
+      AxiosResponse<SuccessResponse<Purchase[]>, any>,
+      unknown
+    >
+  >;
 }
 
-const CardCartView = ({ data }: CardCartViewProps) => {
-  console.log(data);
-  const { setExtendedPurchases } = React.useContext(AppContext);
+const CardCartView = ({ data, refetch }: CardCartViewProps) => {
+  const { setExtendedPurchases, extendedPurchases } =
+    React.useContext(AppContext);
   const handleRemoveItem = async () => {
     try {
     } catch (error) {
@@ -76,18 +94,36 @@ const CardCartView = ({ data }: CardCartViewProps) => {
     }
   };
   const [quantity, setquantity] = React.useState(data.item.buy_count);
-  const handleCheckItem = (productIndex: number) => {
+  const handleCheckItem = (purchaseIndex: number) => {
     return async (value: boolean) => {
       try {
         setExtendedPurchases((prev) =>
           prev.map((x, index) =>
-            index === productIndex ? { ...x, checked: value } : x
+            index === purchaseIndex ? { ...x, checked: value } : x
           )
         );
       } catch (error) {
         console.log(error);
       }
     };
+  };
+  const updatePurchaseMutation = useMutation({
+    mutationFn: updatePurchase,
+    onSuccess: () => {
+      refetch();
+    },
+  });
+  const handleQuantity = (purchaseIndex: number, value: number) => {
+    const purchase = extendedPurchases[purchaseIndex];
+    setExtendedPurchases((prev) =>
+      prev.map((x, index) =>
+        index === purchaseIndex ? { ...x, disabled: true } : x
+      )
+    );
+    updatePurchaseMutation.mutate({
+      product_id: purchase.product._id,
+      buy_count: value,
+    });
   };
   return (
     <View style={styles.favContainer}>

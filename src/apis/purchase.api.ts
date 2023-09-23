@@ -37,5 +37,5 @@ export const updatePurchase = async (body: {
   buy_count: number;
 }) => {
   const headers = await getHeaders();
-  return http.put("purchases/update-purchase", body, { headers });
+  return http.put<SuccessResponse<Purchase>>(`${URL}/update-purchase`, body, { headers });
 };

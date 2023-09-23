@@ -43,6 +43,7 @@ const CartScreen = () => {
       prev.map((purchase) => ({ ...purchase, checked: !isAllChecked }))
     );
   };
+
   return (
     <SafeAreaView>
       <View style={styles.wrapper}>
@@ -64,7 +65,9 @@ const CartScreen = () => {
               marginBottom: 120,
             }}
             data={extendedPurchases}
-            renderItem={(item: any) => <CardCartView data={item} />}
+            renderItem={(item: any) => (
+              <CardCartView refetch={refetch} data={item} />
+            )}
             contentContainerStyle={{ gap: 15, marginVertical: 20 }}
           />
         ) : (
