@@ -27,8 +27,22 @@ const CartScreen = () => {
     queryFn: () => getPurchases({ status: purchasesStatus.inCart }),
     enabled: isAuthenticated,
   });
-  console.log(purchasesInCartData?.data.data);
+  useEffect(() => {
+    setExtendedPurchases(
+      purchasesInCartData?.data.data.map((purchase) => ({
+        ...purchase,
+        disabled: false,
+        checked: false,
+      })) || []
+    );
+  }, [purchasesInCartData]);
   const navigation = useNavigation();
+  const isAllChecked = extendedPurchases.every((purchase) => purchase.checked);
+  const handleCheckAll = () => {
+    setExtendedPurchases((prev) =>
+      prev.map((purchase) => ({ ...purchase, checked: !isAllChecked }))
+    );
+  };
   return (
     <SafeAreaView>
       <View style={styles.wrapper}>
@@ -50,7 +64,7 @@ const CartScreen = () => {
               marginBottom: 120,
             }}
             data={extendedPurchases}
-            renderItem={(item: any) => <CardCartView />}
+            renderItem={(item: any) => <CardCartView data={item} />}
             contentContainerStyle={{ gap: 15, marginVertical: 20 }}
           />
         ) : (
@@ -83,7 +97,12 @@ const CartScreen = () => {
             gap: 10,
           }}
         >
-          <Checkbox style={{ marginRight: 8 }} color={COLORS.primary} />
+          <Checkbox
+            onValueChange={handleCheckAll}
+            value={isAllChecked}
+            style={{ marginRight: 8 }}
+            color={COLORS.primary}
+          />
           <Text>Select All ({extendedPurchases.length} product) </Text>
           <Text style={{ position: "absolute", right: 0 }}>Delete</Text>
         </View>
