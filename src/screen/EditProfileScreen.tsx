@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import React, { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getProfile } from "../apis/user.api";
+import { BodyUpdateProfile, getProfile, updateProfile } from "../apis/user.api";
 import { useForm } from "react-hook-form";
 import { Button, Input } from "../components";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -12,6 +12,8 @@ import * as ImagePicker from "expo-image-picker";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
+import { AppContext } from "../contexts/app.context";
 type FormData = {
   name: string;
   address: string;
@@ -24,6 +26,8 @@ export default function EditProfileScreen() {
     queryKey: ["profile"],
     queryFn: getProfile,
   });
+  const { setProfile } = React.useContext(AppContext);
+  const navigation = useNavigation();
   const profile = profileData?.data.data;
   const {
     register,
@@ -95,7 +99,9 @@ export default function EditProfileScreen() {
   }, [profile, setValue]);
   const onSubmit = async (data: FormData) => {
     try {
-      console.log(data);
+      const res = await updateProfile(data as any);
+      setProfile(res.data.data);
+      navigation.goBack();
     } catch (error) {
       console.log(error);
     }
