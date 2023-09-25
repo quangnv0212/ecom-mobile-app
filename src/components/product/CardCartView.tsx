@@ -8,6 +8,7 @@ import {
 import { AxiosResponse } from "axios";
 import Checkbox from "expo-checkbox";
 import * as React from "react";
+import Toast from "react-native-toast-message";
 import {
   Image,
   StyleSheet,
@@ -47,6 +48,10 @@ const CardCartView = ({ data, refetch }: CardCartViewProps) => {
   const deletePurchasesMutation = useMutation({
     mutationFn: deletePurchase,
     onSuccess: () => {
+      Toast.show({
+        type: "success",
+        text1: "Delete purchase successfully",
+      });
       refetch();
     },
   });
@@ -105,6 +110,10 @@ const CardCartView = ({ data, refetch }: CardCartViewProps) => {
     mutationFn: updatePurchase,
     onSuccess: () => {
       refetch();
+      Toast.show({
+        type: "success",
+        text1: "Update purchase successfully",
+      });
     },
   });
 

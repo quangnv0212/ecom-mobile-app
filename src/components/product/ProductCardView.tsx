@@ -8,6 +8,7 @@ import { Product } from "../../types/product.type";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addToCart } from "../../apis/purchase.api";
 import { purchasesStatus } from "../../constants/purchases";
+import Toast from "react-native-toast-message";
 
 interface ProductCardViewProps {
   data: Product;
@@ -24,6 +25,10 @@ const ProductCardView = ({ data }: ProductCardViewProps) => {
         onSuccess: (data) => {
           queryClient.invalidateQueries({
             queryKey: ["purchases", { status: purchasesStatus.inCart }],
+          });
+          Toast.show({
+            type: "success",
+            text1: "Add to cart successfully",
           });
         },
       }
