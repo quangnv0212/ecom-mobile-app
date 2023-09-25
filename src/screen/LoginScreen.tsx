@@ -30,6 +30,7 @@ const LoginScreen = (props: LoginScreenProps) => {
   const { setIsAuthenticated, setProfile, profile } =
     React.useContext(AppContext);
   const navigation = useNavigation();
+
   const {
     register,
     setValue,

@@ -4,9 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { getProfile } from "../apis/user.api";
 import { useForm } from "react-hook-form";
 import { Button, Input } from "../components";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { COLORS } from "../constants/color";
 import { SIZES } from "../constants/sizes";
+import { Avatar } from "@react-native-material/core";
+import * as ImagePicker from "expo-image-picker";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 type FormData = {
   name: string;
   address: string;
@@ -36,8 +41,46 @@ export default function EditProfileScreen() {
       date_of_birth: new Date(1990, 0, 1),
     },
   });
+  const [image, setImage] = React.useState();
+  const uploadImage = async (uri: any) => {
+    const formData = new FormData();
+    formData.append("image", {
+      uri,
+      name: "image.jpg",
+      type: "image/jpg",
+    });
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.post(
+        "https://api-ecom.duthanhduoc.com/user/upload-avatar",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: JSON.parse(token!),
+          },
+        }
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+      uploadImage(result.assets[0].uri);
+    }
+  };
   useEffect(() => {
     if (profile) {
+      setImage(`https://api-ecom.duthanhduoc.com/images/${profile.avatar}`);
       setValue("name", profile.name);
       setValue("phone", profile.phone);
       setValue("address", profile.address);
@@ -59,7 +102,31 @@ export default function EditProfileScreen() {
   };
   return (
     <View>
-      <Text>EditProfileScreen</Text>
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 30,
+        }}
+      >
+        <View style={{ position: "relative" }}>
+          <Avatar
+            autoColor
+            size={150}
+            image={{
+              uri: image,
+            }}
+          />
+
+          <Feather
+            onPress={pickImage}
+            style={{ position: "absolute", right: 0, bottom: 0 }}
+            name="edit"
+            size={24}
+            color={COLORS.primary}
+          />
+        </View>
+      </View>
       <View style={{ marginHorizontal: 30 }}>
         <Input
           control={control}
