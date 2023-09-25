@@ -15,10 +15,15 @@ import { COLORS } from "../constants/color";
 import { SIZES } from "../constants/sizes";
 import { AppContext } from "../contexts/app.context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { FormattedMessage, IntlProvider, useIntl } from "react-intl";
+import { LOCALES } from "../i18n/locales";
+import { messages } from "../i18n/messages";
 
 interface ProfileScreenProps {}
 
 const ProfileScreen = (props: ProfileScreenProps) => {
+  const intl = useIntl();
+  const { setLanguage, language } = React.useContext(AppContext);
   const logout = () => {
     Alert.alert("Logout", "Are you sure you want to log out", [
       { text: "Cancel", onPress: () => {} },
@@ -33,6 +38,26 @@ const ProfileScreen = (props: ProfileScreenProps) => {
     ]);
   };
   const navigation = useNavigation();
+  const changeLanguage = () => {
+    Alert.alert(
+      intl.formatMessage({ id: "changeLanguage" }),
+      intl.formatMessage({ id: "selectLanguage" }),
+      [
+        {
+          text: "English",
+          onPress: () => {
+            setLanguage(LOCALES.ENGLISH);
+          },
+        },
+        {
+          text: "Tiếng Việt",
+          onPress: () => {
+            setLanguage(LOCALES.VIETNAM);
+          },
+        },
+      ]
+    );
+  };
   const { isAuthenticated, profile, setIsAuthenticated, setProfile } =
     React.useContext(AppContext);
   return (
@@ -57,6 +82,7 @@ const ProfileScreen = (props: ProfileScreenProps) => {
           <Text style={styles.name}>
             {isAuthenticated ? profile?.name : "Please login to your account"}
           </Text>
+
           {!isAuthenticated ? (
             <TouchableOpacity onPress={() => navigation.navigate("Login")}>
               <View style={styles.loginBtn}>
@@ -84,7 +110,9 @@ const ProfileScreen = (props: ProfileScreenProps) => {
                       size={24}
                       color={COLORS.primary}
                     />
-                    <Text style={styles.menuText}>Cart</Text>
+                    <Text style={styles.menuText}>
+                      <FormattedMessage id="cart" />
+                    </Text>
                   </View>
                 </TouchableOpacity>
 
@@ -99,17 +127,21 @@ const ProfileScreen = (props: ProfileScreenProps) => {
                       size={24}
                       color={COLORS.primary}
                     />
-                    <Text style={styles.menuText}>Edit Profile</Text>
+                    <Text style={styles.menuText}>
+                      <FormattedMessage id="editProfile" />
+                    </Text>
                   </View>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => {}}>
+                <TouchableOpacity onPress={changeLanguage}>
                   <View style={menuItem(0.2)}>
                     <FontAwesome
                       name="language"
                       size={24}
                       color={COLORS.primary}
                     />
-                    <Text style={styles.menuText}>Language</Text>
+                    <Text style={styles.menuText}>
+                      <FormattedMessage id="language" />
+                    </Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={logout}>
@@ -119,7 +151,9 @@ const ProfileScreen = (props: ProfileScreenProps) => {
                       size={24}
                       color={COLORS.primary}
                     />
-                    <Text style={styles.menuText}>Log out</Text>
+                    <Text style={styles.menuText}>
+                      <FormattedMessage id="logOut" />
+                    </Text>
                   </View>
                 </TouchableOpacity>
               </View>
