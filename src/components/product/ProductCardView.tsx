@@ -5,13 +5,31 @@ import { COLORS } from "../../constants/color";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Product } from "../../types/product.type";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addToCart } from "../../apis/purchase.api";
+import { purchasesStatus } from "../../constants/purchases";
 
 interface ProductCardViewProps {
   data: Product;
 }
 
 const ProductCardView = ({ data }: ProductCardViewProps) => {
+  const queryClient = useQueryClient();
   const navigation = useNavigation();
+  const addToCartMutation = useMutation(addToCart);
+  const addToCartHandler = () => {
+    addToCartMutation.mutate(
+      { buy_count: 1, product_id: data._id as string },
+      {
+        onSuccess: (data) => {
+          queryClient.invalidateQueries({
+            queryKey: ["purchases", { status: purchasesStatus.inCart }],
+          });
+        },
+      }
+    );
+  };
+
   return (
     <TouchableOpacity
       onPress={() => {
@@ -44,7 +62,7 @@ const ProductCardView = ({ data }: ProductCardViewProps) => {
             })}
           </Text>
         </View>
-        <TouchableOpacity style={styles.addBtn}>
+        <TouchableOpacity onPress={addToCartHandler} style={styles.addBtn}>
           <Ionicons name="add-circle" size={22} color={COLORS.primary} />
         </TouchableOpacity>
       </View>

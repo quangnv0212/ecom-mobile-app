@@ -18,7 +18,9 @@ import {
 } from "@expo/vector-icons";
 import { COLORS } from "../constants/color";
 import productApi from "../apis/product.api";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { addToCart } from "../apis/purchase.api";
+import { purchasesStatus } from "../constants/purchases";
 
 interface ProductDetailScreenProps {
   route?: any;
@@ -37,8 +39,20 @@ const ProductDetailScreen = ({
   const derementCount = () => {
     setCount((count) => count - 1);
   };
-  const addToCart = () => {};
-  const buyNow = () => {};
+  const addToCartMutation = useMutation(addToCart);
+  const queryClient = useQueryClient();
+  const buyNow = () => {
+    addToCartMutation.mutate(
+      { buy_count: count, product_id: id as string },
+      {
+        onSuccess: (data) => {
+          queryClient.invalidateQueries({
+            queryKey: ["purchases", { status: purchasesStatus.inCart }],
+          });
+        },
+      }
+    );
+  };
   const {
     data: productDetailData,
     isError,
@@ -173,7 +187,10 @@ const ProductDetailScreen = ({
               <TouchableOpacity onPress={buyNow} style={styles.cartBtn}>
                 <Text style={styles.cartTitle}>BUY NOW</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={addToCart} style={styles.addCart}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("Cart")}
+                style={styles.addCart}
+              >
                 <Fontisto
                   name="shopping-bag"
                   size={20}

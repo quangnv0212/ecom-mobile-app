@@ -17,11 +17,17 @@ import {
   RefetchOptions,
   RefetchQueryFilters,
   useMutation,
+  useQueryClient,
 } from "@tanstack/react-query";
-import { deletePurchase, updatePurchase } from "../../apis/purchase.api";
+import {
+  addToCart,
+  deletePurchase,
+  updatePurchase,
+} from "../../apis/purchase.api";
 import { AxiosResponse } from "axios";
 import { SuccessResponse } from "../../types/utils.type";
 import { Purchase } from "../../types/purchase.type";
+import { purchasesStatus } from "../../constants/purchases";
 
 interface CardCartViewProps {
   data: any;
@@ -47,7 +53,6 @@ const CardCartView = ({ data, refetch }: CardCartViewProps) => {
       refetch();
     },
   });
-
   const handleAddItem = async () => {
     try {
       setExtendedPurchases((prev) =>
@@ -59,12 +64,10 @@ const CardCartView = ({ data, refetch }: CardCartViewProps) => {
         product_id: data.item.product._id,
         buy_count: data.item.buy_count + 1,
       });
-      console.log(res.data);
     } catch (error) {
       console.log(error);
     }
   };
-
   const handleMinusItem = async () => {
     try {
       if (data.item.buy_count !== 1) {
