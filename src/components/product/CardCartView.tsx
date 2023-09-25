@@ -1,4 +1,11 @@
 import { AntDesign, SimpleLineIcons } from "@expo/vector-icons";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+  useMutation,
+} from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
 import Checkbox from "expo-checkbox";
 import * as React from "react";
 import {
@@ -9,25 +16,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { deletePurchase, updatePurchase } from "../../apis/purchase.api";
 import { COLORS } from "../../constants/color";
 import { SIZES } from "../../constants/sizes";
 import { AppContext } from "../../contexts/app.context";
-import {
-  QueryObserverResult,
-  RefetchOptions,
-  RefetchQueryFilters,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
-import {
-  addToCart,
-  deletePurchase,
-  updatePurchase,
-} from "../../apis/purchase.api";
-import { AxiosResponse } from "axios";
-import { SuccessResponse } from "../../types/utils.type";
 import { Purchase } from "../../types/purchase.type";
-import { purchasesStatus } from "../../constants/purchases";
+import { SuccessResponse } from "../../types/utils.type";
 
 interface CardCartViewProps {
   data: any;
@@ -42,6 +36,9 @@ interface CardCartViewProps {
 }
 
 const CardCartView = ({ data, refetch }: CardCartViewProps) => {
+  const [quantity, setquantity] = React.useState(
+    data.item.buy_count.toString()
+  );
   const { setExtendedPurchases, extendedPurchases } =
     React.useContext(AppContext);
   const handleRemoveItem = () => {
@@ -53,52 +50,43 @@ const CardCartView = ({ data, refetch }: CardCartViewProps) => {
       refetch();
     },
   });
-  const handleAddItem = async () => {
-    try {
+  const handleAddItem = () => {
+    setquantity((prev) => (Number(prev) + 1).toString());
+    setExtendedPurchases((prev) =>
+      prev.map((x) =>
+        x._id === data.item._id ? { ...x, buy_count: x.buy_count + 1 } : x
+      )
+    );
+    updatePurchaseMutation.mutate({
+      product_id: data.item.product._id,
+      buy_count: data.item.buy_count + 1,
+    });
+  };
+  const handleMinusItem = () => {
+    if (data.item.buy_count !== 1) {
+      setquantity((prev) => (Number(prev) - 1).toString());
+
       setExtendedPurchases((prev) =>
         prev.map((x) =>
-          x._id === data.item._id ? { ...x, buy_count: x.buy_count + 1 } : x
+          x._id === data.item._id ? { ...x, buy_count: x.buy_count - 1 } : x
         )
       );
-      const res = await updatePurchase({
+      updatePurchaseMutation.mutate({
         product_id: data.item.product._id,
-        buy_count: data.item.buy_count + 1,
+        buy_count: data.item.buy_count - 1,
       });
-    } catch (error) {
-      console.log(error);
     }
   };
-  const handleMinusItem = async () => {
-    try {
-      if (data.item.buy_count !== 1) {
-        setExtendedPurchases((prev) =>
-          prev.map((x) =>
-            x._id === data.item._id ? { ...x, buy_count: x.buy_count - 1 } : x
-          )
-        );
-        const res = await updatePurchase({
-          product_id: data.item.product._id,
-          buy_count: data.item.buy_count - 1,
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const handleUpdatePurchase = async (quantity: number) => {
-    try {
-      const res = await updatePurchase({
-        buy_count: quantity,
-        product_id: data.item.product._id,
-      });
-      setExtendedPurchases((prev) =>
-        prev.map((x) =>
-          x._id === data.item._id ? { ...x, buy_count: quantity } : x
-        )
-      );
-    } catch (error) {
-      console.log(error);
-    }
+  const handleUpdatePurchase = (quantity: number) => {
+    updatePurchaseMutation.mutate({
+      buy_count: quantity,
+      product_id: data.item.product._id,
+    });
+    setExtendedPurchases((prev) =>
+      prev.map((x) =>
+        x._id === data.item._id ? { ...x, buy_count: quantity } : x
+      )
+    );
   };
   const handleCheckItem = (purchaseIndex: number) => {
     return async (value: boolean) => {
@@ -119,18 +107,7 @@ const CardCartView = ({ data, refetch }: CardCartViewProps) => {
       refetch();
     },
   });
-  const handleQuantity = (purchaseIndex: number, value: number) => {
-    const purchase = extendedPurchases[purchaseIndex];
-    setExtendedPurchases((prev) =>
-      prev.map((x, index) =>
-        index === purchaseIndex ? { ...x, disabled: true } : x
-      )
-    );
-    updatePurchaseMutation.mutate({
-      product_id: purchase.product._id,
-      buy_count: value,
-    });
-  };
+
   return (
     <View style={styles.favContainer}>
       <Checkbox
@@ -165,12 +142,11 @@ const CardCartView = ({ data, refetch }: CardCartViewProps) => {
               width: 50,
               textAlign: "center",
             }}
-            value={extendedPurchases[data.index]?.buy_count.toString()}
+            value={quantity}
             inputMode="decimal"
-            onChangeText={(text) => {
-              handleUpdatePurchase(Number(text));
-            }}
+            onChangeText={(text) => setquantity(text)}
             onEndEditing={(text) => {
+              console.log(text.nativeEvent.text);
               handleUpdatePurchase(Number(text.nativeEvent.text));
             }}
           />
