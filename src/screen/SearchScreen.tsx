@@ -81,7 +81,10 @@ const Search = (props: SearchProps) => {
 export default Search;
 
 const styles = StyleSheet.create({
-  container: {},
+  container: {
+    paddingHorizontal: SIZES.small,
+    paddingBottom: SIZES.xxLarge * 2.5,
+  },
   searchContainer: {
     flexDirection: "row",
     justifyContent: "center",
