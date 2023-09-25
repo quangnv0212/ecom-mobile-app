@@ -18,7 +18,7 @@ import {
   RefetchQueryFilters,
   useMutation,
 } from "@tanstack/react-query";
-import { updatePurchase } from "../../apis/purchase.api";
+import { deletePurchase, updatePurchase } from "../../apis/purchase.api";
 import { AxiosResponse } from "axios";
 import { SuccessResponse } from "../../types/utils.type";
 import { Purchase } from "../../types/purchase.type";
@@ -38,23 +38,28 @@ interface CardCartViewProps {
 const CardCartView = ({ data, refetch }: CardCartViewProps) => {
   const { setExtendedPurchases, extendedPurchases } =
     React.useContext(AppContext);
-  const handleRemoveItem = async () => {
-    try {
-    } catch (error) {
-      console.log(error);
-    }
+  const handleRemoveItem = () => {
+    deletePurchasesMutation.mutate([data.item._id.toString()]);
   };
+  const deletePurchasesMutation = useMutation({
+    mutationFn: deletePurchase,
+    onSuccess: () => {
+      refetch();
+    },
+  });
+
   const handleAddItem = async () => {
     try {
-      // setextendedPurchase((prev) =>
-      //   prev.map((x) =>
-      //     x._id === data.item._id ? { ...x, buy_count: x.buy_count + 1 } : x
-      //   )
-      // );
-      // const res = await updatePurchase({
-      //   product_id: data.item.product._id,
-      //   buy_count: data.item.buy_count + 1,
-      // });
+      setExtendedPurchases((prev) =>
+        prev.map((x) =>
+          x._id === data.item._id ? { ...x, buy_count: x.buy_count + 1 } : x
+        )
+      );
+      const res = await updatePurchase({
+        product_id: data.item.product._id,
+        buy_count: data.item.buy_count + 1,
+      });
+      console.log(res.data);
     } catch (error) {
       console.log(error);
     }
@@ -62,38 +67,36 @@ const CardCartView = ({ data, refetch }: CardCartViewProps) => {
 
   const handleMinusItem = async () => {
     try {
-      // if (data.item.buy_count !== 1) {
-      //   setextendedPurchase((prev) =>
-      //     prev.map((x) =>
-      //       x._id === data.item._id ? { ...x, buy_count: x.buy_count - 1 } : x
-      //     )
-      //   );
-      //   const res = await updatePurchase({
-      //     product_id: data.item.product._id,
-      //     buy_count: data.item.buy_count - 1,
-      //   });
-      // }
+      if (data.item.buy_count !== 1) {
+        setExtendedPurchases((prev) =>
+          prev.map((x) =>
+            x._id === data.item._id ? { ...x, buy_count: x.buy_count - 1 } : x
+          )
+        );
+        const res = await updatePurchase({
+          product_id: data.item.product._id,
+          buy_count: data.item.buy_count - 1,
+        });
+      }
     } catch (error) {
       console.log(error);
     }
   };
   const handleUpdatePurchase = async (quantity: number) => {
     try {
-      // setextendedPurchase((prev) =>
-      //   prev.map((x) =>
-      //     x._id === data.item._id ? { ...x, buy_count: quantity } : x
-      //   )
-      // );
-      // const res = await updatePurchase({
-      //   buy_count: quantity,
-      //   product_id: data.item.product._id,
-      // });
-      // console.log(res.data);
+      const res = await updatePurchase({
+        buy_count: quantity,
+        product_id: data.item.product._id,
+      });
+      setExtendedPurchases((prev) =>
+        prev.map((x) =>
+          x._id === data.item._id ? { ...x, buy_count: quantity } : x
+        )
+      );
     } catch (error) {
       console.log(error);
     }
   };
-  const [quantity, setquantity] = React.useState(data.item.buy_count);
   const handleCheckItem = (purchaseIndex: number) => {
     return async (value: boolean) => {
       try {
@@ -159,10 +162,11 @@ const CardCartView = ({ data, refetch }: CardCartViewProps) => {
               width: 50,
               textAlign: "center",
             }}
-            defaultValue={data.item?.buy_count.toString()}
-            value={quantity}
+            value={extendedPurchases[data.index]?.buy_count.toString()}
             inputMode="decimal"
-            onChangeText={(text) => setquantity(text)}
+            onChangeText={(text) => {
+              handleUpdatePurchase(Number(text));
+            }}
             onEndEditing={(text) => {
               handleUpdatePurchase(Number(text.nativeEvent.text));
             }}

@@ -37,12 +37,27 @@ const CartScreen = () => {
     );
   }, [purchasesInCartData]);
   const navigation = useNavigation();
-  const isAllChecked = extendedPurchases.every((purchase) => purchase.checked);
   const handleCheckAll = () => {
     setExtendedPurchases((prev) =>
       prev.map((purchase) => ({ ...purchase, checked: !isAllChecked }))
     );
   };
+  const isAllChecked = React.useMemo(
+    () => extendedPurchases.every((purchase) => purchase.checked),
+    [extendedPurchases]
+  );
+  const checkedPurchases = React.useMemo(
+    () => extendedPurchases.filter((purchase) => purchase.checked),
+    [extendedPurchases]
+  );
+  const checkedPurchasesCount = checkedPurchases.length;
+  const totalCheckedPurchasePrice = React.useMemo(
+    () =>
+      checkedPurchases.reduce((result, current) => {
+        return result + current.product.price * current.buy_count;
+      }, 0),
+    [checkedPurchases]
+  );
 
   return (
     <SafeAreaView>
@@ -112,10 +127,10 @@ const CartScreen = () => {
         <View>
           <Text style={{ textAlign: "center" }}>
             Total:{" "}
-            {/* {total.toLocaleString("vi", {
+            {totalCheckedPurchasePrice.toLocaleString("vi", {
               style: "currency",
               currency: "VND",
-            })} */}
+            })}
           </Text>
         </View>
         <Button color={COLORS.primary} title="Buy now" />
