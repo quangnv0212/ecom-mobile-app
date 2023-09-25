@@ -5,6 +5,6 @@ export const SIZES = {
     large:20,
     xLarge:24,
     xxLarge:44,
-    width:380,
+    width:430,
     height:600
 }
